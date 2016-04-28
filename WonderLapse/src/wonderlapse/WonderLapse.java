@@ -35,6 +35,8 @@ public class WonderLapse extends Application {
     Stage primaryStage;
     Scene scene = new Scene(root, 720, 480);
     DataManager fileChooser = new DataManager();
+    final File sequenceSaver = new File("");
+    
     
     
     
@@ -67,7 +69,7 @@ public class WonderLapse extends Application {
         
         root.getChildren().add(bp);
         
-         scene.setRoot(root);
+        scene.setRoot(root);
         
         
          
@@ -76,6 +78,7 @@ public class WonderLapse extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setMaximized(true);
         
     }
 
