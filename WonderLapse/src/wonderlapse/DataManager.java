@@ -26,7 +26,6 @@ public class DataManager {
         fileChooser.put("img", new FileChooser());
         fileChooser.get("img").getExtensionFilters().add(new ExtensionFilter("IMG", "*.png", "*.jpg", "*.jpeg"));
         fileChooser.get("img").setTitle("img");
-       
     }
     
     /**
