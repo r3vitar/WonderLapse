@@ -51,19 +51,21 @@ public class WonderLapse extends Application {
     MenuBar mainBar = new MenuBar(fileMenu, editMenu, optionsMenu);
     
     //right
-    TitledPane timlapsePane= new TitledPane("TimeLapse", null);
-    TitledPane renderPane= new TitledPane("Render", null);
-    TitledPane managePane= new TitledPane("ManageFiles", null);
-    Accordion sideAccordion = new Accordion(timlapsePane, renderPane, managePane);
+    
     
     //center
     ObservableList<ImageView> galleryItems = FXCollections.observableArrayList();
     TilePane galleryPane = new TilePane();
     
-    BorderPane centerBorderPane = new BorderPane(galleryPane);
+    TitledPane timlapsePane= new TitledPane("TimeLapse", null);
+    TitledPane renderPane= new TitledPane("Render", null);
+    TitledPane managePane= new TitledPane("ManageFiles", galleryPane);
+    Accordion mainAccordion = new Accordion(timlapsePane, renderPane, managePane);
+    
+    BorderPane centerBorderPane = new BorderPane(mainAccordion);
     
     
-     BorderPane root = new BorderPane(null, mainBar, sideAccordion, null, null);
+     BorderPane root = new BorderPane(centerBorderPane, mainBar, null, null, null);
     Stage primaryStage;
     Scene scene = new Scene(root, 720, 480);
     DataManager fileChooser = new DataManager();
@@ -85,7 +87,7 @@ public class WonderLapse extends Application {
         
         
         Button b1 = new Button("get");
-        Button b5 = new Button("get");
+        
         b1.setOnAction((ActionEvent e) -> sss.initPics());
         
         Button setFps = new Button("setFps");
@@ -107,7 +109,7 @@ public class WonderLapse extends Application {
         
         
         //root.getChildren().add(bp);
-        
+        this.timlapsePane.setContent(bp);
         scene.setRoot(root);
         
         
