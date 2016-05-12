@@ -26,6 +26,10 @@ public class DataManager {
         fileChooser.put("img", new FileChooser());
         fileChooser.get("img").getExtensionFilters().add(new ExtensionFilter("IMG", "*.png", "*.jpg", "*.jpeg"));
         fileChooser.get("img").setTitle("img");
+        
+        fileChooser.put("wl", new FileChooser());
+        fileChooser.get("wl").getExtensionFilters().add(new ExtensionFilter("WonderLapse-Sequence", "*.wls"));
+       
     }
     
     /**
@@ -54,8 +58,8 @@ public class DataManager {
      * 
      * @return Gibt die aktuelle Playlist als File zurück.
      */
-    public File savePlaylist() {
-        return fileChooser.get("npl").showSaveDialog(new Stage());
+    public File saveWonderLapse() {
+        return fileChooser.get("wl").showSaveDialog(new Stage());
     }
 
 }
