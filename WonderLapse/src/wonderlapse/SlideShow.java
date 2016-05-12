@@ -38,8 +38,10 @@ public class SlideShow extends Pane {
     ProgressBar pb = new ProgressBar();
     double progress = 0;
     boolean b = new Boolean(false);
+    SomeListener sl;
 
-    public SlideShow() {
+    public SlideShow(SomeListener sl) {
+        this.sl = sl;
         slp = new Duration((1 / 5) * 1000);
         System.out.println(slp.toSeconds());
 
@@ -166,6 +168,10 @@ public class SlideShow extends Pane {
             }
         });
         prT.start();
+        double width;
+        double height;
+        
+        
 
         Thread t1 = new Thread(new Task() {
 
@@ -175,6 +181,7 @@ public class SlideShow extends Pane {
                 for (double idx = 0; idx < images.size() /*/ 4*/; idx++) {
                     InputStream is = new FileInputStream(images.get((int) idx));
                     Image i = new Image(is, 1280, 720, true, false);
+                    
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {

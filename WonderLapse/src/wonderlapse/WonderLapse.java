@@ -39,7 +39,7 @@ import javafx.util.Duration;
  *
  * @author kacpe_000
  */
-public class WonderLapse extends Application {
+public class WonderLapse extends Application implements SomeListener {
    
     
     //top
@@ -83,7 +83,7 @@ public class WonderLapse extends Application {
         primaryStage = ps;
         
         
-        SlideShow sss = new SlideShow();
+        SlideShow sss = new SlideShow(this);
         
         
         Button b1 = new Button("get");
