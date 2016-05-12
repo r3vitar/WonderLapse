@@ -37,7 +37,7 @@ public class SlideShow extends Pane {
     ArrayList<File> images = new ArrayList<File>();
     ProgressBar pb = new ProgressBar();
     double progress = 0;
-            boolean b = new Boolean(false);
+    boolean b = new Boolean(false);
 
     public SlideShow() {
         slp = new Duration((1 / 5) * 1000);
@@ -46,7 +46,7 @@ public class SlideShow extends Pane {
     }
 
     public void setFps(double fps) {
-        slp = new Duration((1 / fps) * 1000);
+        slp = new Duration(1000 / fps);
         System.out.println(slp.toMillis());
     }
 
@@ -60,9 +60,11 @@ public class SlideShow extends Pane {
 
         for (Object o : fileList) {
             File f = (File) o;
+            
 
             images.add(f);
         }
+        System.out.println(images.size());
     }
 
     public void start() {
@@ -71,36 +73,62 @@ public class SlideShow extends Pane {
         getChildren().add(pb);
 
         timelapse = new Thread(new Task() {
+            
+            int cnt = 0;
 
             @Override
             protected Object call() throws Exception {
-                
-                ArrayList<Image> loadedImages = loadImages();
-                
-                for (Image frame : loadedImages) {
-                    Platform.runLater(new Task() {
+                try {
+                    ArrayList<Image> loadedImages = loadImages();
 
-                        @Override
-                        protected Object call() throws Exception {
-                            getChildren().clear();
-                            ImageView iv = new ImageView(frame);
-                            iv.setPreserveRatio(true);
-                            iv.setFitHeight(frame.getHeight());
-                            iv.setFitWidth(frame.getWidth());
-                            
-                            getChildren().add(iv);
-                            return true;
+                    for (Image frame : loadedImages) {
+                        
+                        
+                        try {
+                            Platform.runLater(new Task() {
 
+                                @Override
+                                protected Object call() throws Exception {
+                                    try {
+                                        getChildren().clear();
+                                        ImageView iv = new ImageView(frame);
+                                        iv.setPreserveRatio(true);
+                                        iv.setFitHeight(frame.getHeight());
+                                        iv.setFitWidth(frame.getWidth());
+                                        Platform.runLater(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                cnt++;
+                                                System.out.println(cnt);
+                                            }
+                                        });
+
+                                        getChildren().add(iv);
+                                    } catch (Exception e) {
+                                        System.err.println(e);
+                                        return false;
+                                    }
+                                    return true;
+
+                                }
+                            });
+
+                            try {
+                                Thread.sleep(getFrameRateAsMilli());
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        } catch (Exception e) {
+                            System.err.println(e);
                         }
-                    });
 
-                    try {
-                        Thread.sleep(getFrameRateAsMilli());
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
+                } catch (Exception e) {
+                    System.err.println(e);
                 }
+
                 return true;
             }
 
@@ -110,7 +138,6 @@ public class SlideShow extends Pane {
 
     }
 
-
     private long getFrameRateAsMilli() {
         return (long) slp.toMillis();
     }
@@ -118,38 +145,41 @@ public class SlideShow extends Pane {
     public ArrayList<Image> loadImages() {
         ArrayList<Image> slides = new ArrayList<Image>();
         progress = 0;
+        b = false;
+        
+        
         
         Thread prT = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
                 do {
-                    pb.setProgress(progress / images.size() * 4);
+                    pb.setProgress(progress / images.size());
                     try {
                         Thread.sleep(5);
                     } catch (Exception e) {
 
                     }
-                } while (progress * 4< images.size() && !b);
+                } while (progress <= images.size() && !b);
                 return true;
 
             }
         });
         prT.start();
-        
+
         Thread t1 = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
 
-                for (double idx = 0; idx < images.size() / 4; idx++) {
-                    InputStream is = new FileInputStream(images.get((int)idx));
+                for (double idx = 0; idx < images.size() /*/ 4*/; idx++) {
+                    InputStream is = new FileInputStream(images.get((int) idx));
                     Image i = new Image(is, 1280, 720, true, false);
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {
 
-                        slides.add((int)idx, i);
+                        slides.add((int) idx, i);
                         updateProgress2();
                     }
                     is.close();
@@ -158,19 +188,19 @@ public class SlideShow extends Pane {
                 return true;
             }
         });
-        t1.start();
+        
         Thread t2 = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
                 for (double idx = images.size() / 4; idx < images.size() / 2; idx++) {
-                    InputStream is = new FileInputStream(images.get((int)idx));
+                    InputStream is = new FileInputStream(images.get((int) idx));
                     Image i = new Image(is, 1280, 720, true, false);
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {
 
-                        slides.add((int)idx, i);
+                        slides.add((int) idx, i);
                         updateProgress2();
                     }
                     is.close();
@@ -179,19 +209,19 @@ public class SlideShow extends Pane {
                 return true;
             }
         });
-        t2.start();
+        
         Thread t3 = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
                 for (double idx = images.size() / 2; idx < images.size() / 4 * 3; idx++) {
-                    InputStream is = new FileInputStream(images.get((int)idx));
+                    InputStream is = new FileInputStream(images.get((int) idx));
                     Image i = new Image(is, 1280, 720, true, false);
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {
 
-                        slides.add((int)idx, i);
+                        slides.add((int) idx, i);
                         updateProgress2();
                     }
                     is.close();
@@ -200,20 +230,20 @@ public class SlideShow extends Pane {
                 return true;
             }
         });
-        t3.start();
+        
         Thread t4 = new Thread(new Task() {
-
+            
             @Override
             protected Object call() throws Exception {
 
                 for (double idx = images.size() / 4 * 3; idx < images.size(); idx++) {
-                    InputStream is = new FileInputStream(images.get((int)idx));
+                    InputStream is = new FileInputStream(images.get((int) idx));
                     Image i = new Image(is, 1280, 720, true, false);
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {
 
-                        slides.add((int)idx, i);
+                        slides.add((int) idx, i);
 
                         updateProgress2();
                     }
@@ -222,22 +252,25 @@ public class SlideShow extends Pane {
                 return true;
             }
         });
-        t4.start();
+        t1.start();
+//        t2.start();
+//        t3.start();
+//        t4.start();
 
         try {
             t1.join();
-            t2.join();
-            t3.join();
-            t4.join();
-            b=true;
+//            t2.join();
+//            t3.join();
+//            t4.join();
+            b = true;
         } catch (InterruptedException ex) {
             Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return slides;
     }
-    
-    public void updateProgress2(){
+
+    public void updateProgress2() {
         progress++;
     }
 
