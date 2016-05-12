@@ -19,15 +19,23 @@ public class SlideShowInfo implements Serializable {
     ArrayList<File> files = new ArrayList<File>();
     
     double frameRate;
-    double sequenceWidth;
-    double sequenceHeight;
+    Resolution res;
     Duration sequenceDur;
     File exportLocation;
 
+    public SlideShowInfo(double frameRate, double sequenceWidth, double sequenceHeight) {
+        this.frameRate = frameRate;
+        this.res = new Resolution(sequenceWidth, sequenceHeight);
+        
+    }
+    public SlideShowInfo(double frameRate, Resolution res) {
+        this.frameRate = frameRate;
+        this.res = res;
+        
+    }
     public SlideShowInfo(double frameRate, double sequenceWidth, double sequenceHeight, Duration sequenceDur, File exportLocation) {
         this.frameRate = frameRate;
-        this.sequenceWidth = sequenceWidth;
-        this.sequenceHeight = sequenceHeight;
+        this.res = new Resolution(sequenceWidth, sequenceHeight);
         this.sequenceDur = sequenceDur;
         this.exportLocation = exportLocation;
     }
@@ -49,19 +57,30 @@ public class SlideShowInfo implements Serializable {
     }
 
     public double getSequenceWidth() {
-        return sequenceWidth;
+        return res.getWidth();
     }
 
     public void setSequenceWidth(double sequenceWidth) {
-        this.sequenceWidth = sequenceWidth;
+        this.res.setWidth(sequenceWidth);
     }
 
     public double getSequenceHeight() {
-        return sequenceHeight;
+        return res.getHeight();
     }
 
     public void setSequenceHeight(double sequenceHeight) {
-        this.sequenceHeight = sequenceHeight;
+        this.res.setHeight(sequenceHeight);
+    }
+    
+    public void setSequenceResolution(double sequenceWidth, double sequenceHeight){
+        this.res = new Resolution(sequenceWidth, sequenceHeight);
+    }
+    public void setSequenceResolution(Resolution res){
+        this.res = res;
+    }
+    
+    public Resolution getRes(){
+        return this.res;
     }
 
     public Duration getSequenceDur() {

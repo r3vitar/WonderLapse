@@ -36,6 +36,17 @@ public class Resolution {
         
     }
 
+    public Resolution() {
+    }
+    public Resolution(double width, double height) {
+        this.height = height;
+        this.width = width;
+    }
+    
+    public double countRes(){
+        return this.width*this.height;
+    }
+
     @Override
     public String toString() {
         return width + "x" + height;

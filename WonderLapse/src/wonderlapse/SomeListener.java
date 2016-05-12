@@ -11,5 +11,5 @@ package wonderlapse;
  * @author kacpe_000
  */
 public interface SomeListener {
-    
+       public Resolution getTimelapsePaneRes();
 }

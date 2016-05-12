@@ -129,5 +129,10 @@ public class WonderLapse extends Application implements SomeListener {
     public static void main(String[] args) {
         launch(args);
     }
+
+    @Override
+    public Resolution getTimelapsePaneRes() {
+        return new Resolution(timlapsePane.getWidth(), timlapsePane.getHeight());
+    }
     
 }

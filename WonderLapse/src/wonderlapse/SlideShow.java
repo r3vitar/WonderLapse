@@ -38,13 +38,34 @@ public class SlideShow extends Pane {
     ProgressBar pb = new ProgressBar();
     double progress = 0;
     boolean b = new Boolean(false);
+    SlideShowInfo ssi;
     SomeListener sl;
+    Resolution res = null;
+    ArrayList<Image> slides;
 
+    public SlideShow(SomeListener sl, double width, double height) {
+        this.sl = sl;
+        slp = new Duration((1 / 5) * 1000);
+        System.out.println(slp.toSeconds());
+        
+        ssi = new SlideShowInfo(progress, new Resolution(width, height));
+
+    }
+    
     public SlideShow(SomeListener sl) {
         this.sl = sl;
         slp = new Duration((1 / 5) * 1000);
         System.out.println(slp.toSeconds());
+        
+        ssi = new SlideShowInfo(progress, new Resolution(1280, 720));
 
+    }
+    
+    public void setResolution(Resolution res){
+        ssi.setSequenceResolution(res);
+    }
+    public void setResolution(double width, double height){
+        ssi.setSequenceResolution(width, height);
     }
 
     public void setFps(double fps) {
@@ -94,9 +115,10 @@ public class SlideShow extends Pane {
                                     try {
                                         getChildren().clear();
                                         ImageView iv = new ImageView(frame);
+                                        iv.setFitHeight(sl.getTimelapsePaneRes().getHeight());
+                                        iv.setFitWidth(sl.getTimelapsePaneRes().getWidth());
                                         iv.setPreserveRatio(true);
-                                        iv.setFitHeight(frame.getHeight());
-                                        iv.setFitWidth(frame.getWidth());
+                                        
                                         Platform.runLater(new Runnable() {
 
                                             @Override
@@ -145,7 +167,7 @@ public class SlideShow extends Pane {
     }
 
     public ArrayList<Image> loadImages() {
-        ArrayList<Image> slides = new ArrayList<Image>();
+        slides = new ArrayList<Image>();
         progress = 0;
         b = false;
         
@@ -168,8 +190,11 @@ public class SlideShow extends Pane {
             }
         });
         prT.start();
-        double width;
-        double height;
+        
+        if(sl.getTimelapsePaneRes().countRes() < ssi.getRes().countRes()){
+            res = sl.getTimelapsePaneRes();
+        }else
+            res = ssi.getRes();
         
         
 
@@ -180,7 +205,7 @@ public class SlideShow extends Pane {
 
                 for (double idx = 0; idx < images.size() /*/ 4*/; idx++) {
                     InputStream is = new FileInputStream(images.get((int) idx));
-                    Image i = new Image(is, 1280, 720, true, false);
+                    Image i = new Image(is, res.getWidth(), res.getHeight(), true, false);
                     
                     if (i.isError()) {
                         System.err.println("büd geht ned");
@@ -196,69 +221,7 @@ public class SlideShow extends Pane {
             }
         });
         
-        Thread t2 = new Thread(new Task() {
-
-            @Override
-            protected Object call() throws Exception {
-                for (double idx = images.size() / 4; idx < images.size() / 2; idx++) {
-                    InputStream is = new FileInputStream(images.get((int) idx));
-                    Image i = new Image(is, 1280, 720, true, false);
-                    if (i.isError()) {
-                        System.err.println("büd geht ned");
-                    } else {
-
-                        slides.add((int) idx, i);
-                        updateProgress2();
-                    }
-                    is.close();
-
-                }
-                return true;
-            }
-        });
-        
-        Thread t3 = new Thread(new Task() {
-
-            @Override
-            protected Object call() throws Exception {
-                for (double idx = images.size() / 2; idx < images.size() / 4 * 3; idx++) {
-                    InputStream is = new FileInputStream(images.get((int) idx));
-                    Image i = new Image(is, 1280, 720, true, false);
-                    if (i.isError()) {
-                        System.err.println("büd geht ned");
-                    } else {
-
-                        slides.add((int) idx, i);
-                        updateProgress2();
-                    }
-                    is.close();
-
-                }
-                return true;
-            }
-        });
-        
-        Thread t4 = new Thread(new Task() {
-            
-            @Override
-            protected Object call() throws Exception {
-
-                for (double idx = images.size() / 4 * 3; idx < images.size(); idx++) {
-                    InputStream is = new FileInputStream(images.get((int) idx));
-                    Image i = new Image(is, 1280, 720, true, false);
-                    if (i.isError()) {
-                        System.err.println("büd geht ned");
-                    } else {
-
-                        slides.add((int) idx, i);
-
-                        updateProgress2();
-                    }
-                    is.close();
-                }
-                return true;
-            }
-        });
+  
         t1.start();
 //        t2.start();
 //        t3.start();
