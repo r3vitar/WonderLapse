@@ -67,6 +67,7 @@ public class WonderLapse extends Application {
     Stage primaryStage;
     Scene scene = new Scene(root, 720, 480);
     DataManager fileChooser = new DataManager();
+    
     final File sequenceSaver = new File("");
     
     
@@ -84,6 +85,7 @@ public class WonderLapse extends Application {
         
         
         Button b1 = new Button("get");
+        Button b5 = new Button("get");
         b1.setOnAction((ActionEvent e) -> sss.initPics());
         
         Button setFps = new Button("setFps");
