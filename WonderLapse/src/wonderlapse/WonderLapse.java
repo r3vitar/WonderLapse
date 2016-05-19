@@ -32,6 +32,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -88,6 +89,12 @@ public class WonderLapse extends Application implements SomeListener {
         
         Button b1 = new Button("get");
         
+        Button bSave = new Button("Save");
+        
+        bSave.setOnAction((ActionEvent) -> {
+            sss.save();
+        });
+        
         b1.setOnAction((ActionEvent e) -> sss.initPics());
         
         Button setFps = new Button("setFps");
@@ -103,7 +110,7 @@ public class WonderLapse extends Application implements SomeListener {
         
         BorderPane bp = new BorderPane(sss);
         bp.setLeft(b1);
-        bp.setRight(b2);
+        bp.setRight(new VBox(b2, bSave));
         bp.setBottom(h);
         
         
@@ -119,7 +126,7 @@ public class WonderLapse extends Application implements SomeListener {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
-        primaryStage.setMaximized(true);
+        //primaryStage.setMaximized(true);
         
     }
 

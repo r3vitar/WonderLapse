@@ -22,6 +22,15 @@ public class SlideShowInfo implements Serializable {
     Resolution res;
     Duration sequenceDur;
     File exportLocation;
+    String name = "untitled";
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public SlideShowInfo(double frameRate, double sequenceWidth, double sequenceHeight) {
         this.frameRate = frameRate;

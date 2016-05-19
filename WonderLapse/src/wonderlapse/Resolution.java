@@ -5,11 +5,13 @@
  */
 package wonderlapse;
 
+import java.io.Serializable;
+
 /**
  *
  * @author kacpe_000
  */
-public class Resolution {
+public class Resolution implements Serializable{
 
     double width = 0;
     double height = 0;

@@ -7,7 +7,13 @@ package wonderlapse;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,7 +34,7 @@ import javafx.util.Duration;
  *
  * @author kacpe_000
  */
-public class SlideShow extends Pane {
+public class SlideShow extends Pane implements Serializable{
 
     DataManager fileChooser = new DataManager();
 
@@ -242,6 +248,36 @@ public class SlideShow extends Pane {
 
     public void updateProgress2() {
         progress++;
+    }
+
+   public void save() {
+       FileOutputStream fos = null;
+       ObjectOutputStream oos = null;
+        try {
+            File f = new File(ssi.getName());
+            fos = new FileOutputStream(f);
+            oos = new ObjectOutputStream(fos);
+            
+            oos.writeObject(this);
+            
+            
+            
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fos.close();
+                oos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+       
+       
+        
     }
 
 }
