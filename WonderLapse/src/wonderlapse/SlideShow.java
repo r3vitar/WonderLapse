@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -36,18 +37,25 @@ import javafx.util.Duration;
  */
 public class SlideShow extends Pane implements Serializable{
 
-    DataManager fileChooser = new DataManager();
+    transient DataManager fileChooser = new DataManager();
+    public static long serialVerUID = 1L;
+
+    
 
     Duration slp = Duration.UNKNOWN;
-    Thread timelapse = new Thread();
+    transient Thread timelapse;
     ArrayList<File> images = new ArrayList<File>();
-    ProgressBar pb = new ProgressBar();
+    transient ProgressBar pb;
     double progress = 0;
-    boolean b = new Boolean(false);
+    boolean b = false;
     SlideShowInfo ssi;
-    SomeListener sl;
+    transient SomeListener sl;
+
+    public void setSl(SomeListener sl) {
+        this.sl = sl;
+    }
     Resolution res = null;
-    ArrayList<Image> slides;
+    transient ArrayList<Image> slides;
 
     public SlideShow(SomeListener sl, double width, double height) {
         this.sl = sl;
@@ -66,6 +74,11 @@ public class SlideShow extends Pane implements Serializable{
         ssi = new SlideShowInfo(progress, new Resolution(1280, 720));
 
     }
+    
+    public void setFileChooser(DataManager fileChooser) {
+        this.fileChooser = fileChooser;
+    }
+
     
     public void setResolution(Resolution res){
         ssi.setSequenceResolution(res);
@@ -97,7 +110,7 @@ public class SlideShow extends Pane implements Serializable{
     }
 
     public void start() {
-
+        pb = new ProgressBar();
         getChildren().clear();
         getChildren().add(pb);
 
@@ -174,6 +187,7 @@ public class SlideShow extends Pane implements Serializable{
 
     public ArrayList<Image> loadImages() {
         slides = new ArrayList<Image>();
+        pb = new ProgressBar();
         progress = 0;
         b = false;
         
@@ -183,6 +197,7 @@ public class SlideShow extends Pane implements Serializable{
 
             @Override
             protected Object call() throws Exception {
+               
                 do {
                     pb.setProgress(progress / images.size());
                     try {
@@ -250,11 +265,10 @@ public class SlideShow extends Pane implements Serializable{
         progress++;
     }
 
-   public void save() {
+   public void save(File f) {
        FileOutputStream fos = null;
        ObjectOutputStream oos = null;
         try {
-            File f = new File(ssi.getName());
             fos = new FileOutputStream(f);
             oos = new ObjectOutputStream(fos);
             
@@ -278,6 +292,27 @@ public class SlideShow extends Pane implements Serializable{
        
        
         
+    }
+
+    public static SlideShow loadSlideShow(File f, SomeListener sl) throws FileNotFoundException, IOException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(f);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        
+        SlideShow temp = (SlideShow) ois.readObject();
+        
+        temp.setSl(sl);
+        
+        temp.setFileChooser(new DataManager());
+        
+        return temp;
+        
+    }
+    
+    public Image getFirstImage() throws FileNotFoundException{
+        return new Image(new FileInputStream(this.images.get((int)Math.round(Math.random()*this.images.size()))));
+    }
+    public static Image getFirstImage(SlideShow s) throws FileNotFoundException{
+        return new Image(new FileInputStream(s.images.get((int)Math.round(Math.random()*s.images.size()))));
     }
 
 }

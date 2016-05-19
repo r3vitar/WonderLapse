@@ -6,8 +6,11 @@
 package wonderlapse;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
@@ -72,6 +75,8 @@ public class WonderLapse extends Application implements SomeListener {
     DataManager fileChooser = new DataManager();
     
     final File sequenceSaver = new File("");
+    SlideShow sss;
+    
     
     
     
@@ -84,7 +89,7 @@ public class WonderLapse extends Application implements SomeListener {
         primaryStage = ps;
         
         
-        SlideShow sss = new SlideShow(this);
+        sss = new SlideShow(this);
         
         
         Button b1 = new Button("get");
@@ -92,12 +97,28 @@ public class WonderLapse extends Application implements SomeListener {
         Button bSave = new Button("Save");
         
         bSave.setOnAction((ActionEvent) -> {
-            sss.save();
+            File f = new DataManager().saveWonderLapse();
+                    
+            sss.save(f);
         });
         
         b1.setOnAction((ActionEvent e) -> sss.initPics());
         
         Button setFps = new Button("setFps");
+        BorderPane bp = new BorderPane();
+        Button bLoad = new Button("Load");
+        bLoad.setOnAction((ActionEvent) -> {
+            try {
+                File f = new DataManager().chooseSingleFile("wl");
+                sss = SlideShow.loadSlideShow(f, this);
+            } catch (IOException ex) {
+                Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+            }finally{
+                bp.setCenter(sss);
+            }
+        });
         
         TextField tf = new TextField();
         setFps.setOnAction((ActionEvent event) -> sss.setFps(Double.parseDouble(tf.getText())));
@@ -108,9 +129,9 @@ public class WonderLapse extends Application implements SomeListener {
         Button b2 = new Button("play");
         b2.setOnAction((ActionEvent e) -> sss.start());
         
-        BorderPane bp = new BorderPane(sss);
+        bp.setCenter(sss);
         bp.setLeft(b1);
-        bp.setRight(new VBox(b2, bSave));
+        bp.setRight(new VBox(b2, bSave, bLoad));
         bp.setBottom(h);
         
         
