@@ -114,7 +114,7 @@ public class WonderLapse extends Application implements SomeListener {
             
             this.lapseList.add(sss.)
         });
-        
+        //test
         b1.setOnAction((ActionEvent e) -> sss.initPics());
         
         Button setFps = new Button("setFps");
