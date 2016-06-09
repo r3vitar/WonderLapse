@@ -44,7 +44,7 @@ public class SlideShow extends Pane implements Serializable{
 
     Duration slp = Duration.UNKNOWN;
     transient Thread timelapse;
-    ArrayList<File> images = new ArrayList<File>();
+    //ArrayList<File> images = new ArrayList<File>();
     transient ProgressBar pb;
     double progress = 0;
     boolean b = false;
@@ -106,15 +106,16 @@ public class SlideShow extends Pane implements Serializable{
     }
 
     public void initPics() {
+        ssi.getFiles().clear();
         List fileList = fileChooser.chooseMultipleFiles("img");
 
         for (Object o : fileList) {
             File f = (File) o;
             
 
-            images.add(f);
+            ssi.addFile(f);
         }
-        System.out.println(images.size());
+        System.out.println(ssi.getFiles().size());
     }
 
     public void start() {
@@ -207,13 +208,13 @@ public class SlideShow extends Pane implements Serializable{
             protected Object call() throws Exception {
                
                 do {
-                    pb.setProgress(progress / images.size());
+                    pb.setProgress(progress / ssi.getFiles().size());
                     try {
                         Thread.sleep(5);
                     } catch (Exception e) {
 
                     }
-                } while (progress <= images.size() && !b);
+                } while (progress <= ssi.getFiles().size() && !b);
                 return true;
 
             }
@@ -232,8 +233,8 @@ public class SlideShow extends Pane implements Serializable{
             @Override
             protected Object call() throws Exception {
 
-                for (double idx = 0; idx < images.size() /*/ 4*/; idx++) {
-                    InputStream is = new FileInputStream(images.get((int) idx));
+                for (double idx = 0; idx < ssi.getFiles().size() /*/ 4*/; idx++) {
+                    InputStream is = new FileInputStream(ssi.getFiles().get((int) idx));
                     Image i = new Image(is, res.getWidth(), res.getHeight(), true, false);
                     
                     if (i.isError()) {
@@ -330,10 +331,10 @@ public class SlideShow extends Pane implements Serializable{
     }
     
     public Image getFirstImage() throws FileNotFoundException{
-        return new Image(new FileInputStream(this.images.get((int)Math.round(Math.random()*this.images.size()))));
+        return new Image(new FileInputStream(this.ssi.getFiles().get((int)Math.round(Math.random()*this.ssi.getFiles().size()))));
     }
     public static Image getFirstImage(SlideShow s) throws FileNotFoundException{
-        return new Image(new FileInputStream(s.images.get((int)Math.round(Math.random()*s.images.size()))));
+        return new Image(new FileInputStream(s.ssi.getFiles().get((int)Math.round(Math.random()*s.ssi.getFiles().size()))));
     }
 
 }
