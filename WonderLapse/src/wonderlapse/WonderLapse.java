@@ -6,7 +6,12 @@
 package wonderlapse;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,6 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
@@ -37,6 +43,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 /**
@@ -58,8 +65,9 @@ public class WonderLapse extends Application implements SomeListener {
     
     
     //center
+    ArrayList<SlideShowInfo> lapseList = new ArrayList<SlideShowInfo>();
     ObservableList<ImageView> galleryItems = FXCollections.observableArrayList();
-    TilePane galleryPane = new TilePane();
+    TilePane galleryPane = new TilePane(Orientation.VERTICAL);
     
     TitledPane timlapsePane= new TitledPane("TimeLapse", null);
     TitledPane renderPane= new TitledPane("Render", null);
@@ -86,6 +94,9 @@ public class WonderLapse extends Application implements SomeListener {
     
     @Override
     public void start(Stage ps) {
+        
+        initWL();
+        
         primaryStage = ps;
         
         
@@ -100,6 +111,8 @@ public class WonderLapse extends Application implements SomeListener {
             File f = new DataManager().saveWonderLapse();
                     
             sss.save(f);
+            
+            this.lapseList.add(sss.)
         });
         
         b1.setOnAction((ActionEvent e) -> sss.initPics());
@@ -110,7 +123,8 @@ public class WonderLapse extends Application implements SomeListener {
         bLoad.setOnAction((ActionEvent) -> {
             try {
                 File f = new DataManager().chooseSingleFile("wl");
-                sss = SlideShow.loadSlideShow(f, this);
+                if(f != null)
+                    sss = SlideShow.loadSlideShow(f, this);
             } catch (IOException ex) {
                 Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
@@ -134,6 +148,14 @@ public class WonderLapse extends Application implements SomeListener {
         bp.setRight(new VBox(b2, bSave, bLoad));
         bp.setBottom(h);
         
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                saveLapses();
+
+            }
+        });
+        saveLapses();
         
         
         //root.getChildren().add(bp);
@@ -161,6 +183,56 @@ public class WonderLapse extends Application implements SomeListener {
     @Override
     public Resolution getTimelapsePaneRes() {
         return new Resolution(timlapsePane.getWidth(), timlapsePane.getHeight());
+    }
+
+    private void saveLapses() {
+
+        try {
+            FileOutputStream fos = new FileOutputStream(new File("lapses.wlc"));
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            
+            try{
+                oos.writeObject(this.lapseList);
+            }catch(Exception e){
+                System.err.println(e);
+            }finally{
+                oos.flush();
+                fos.close();
+            }
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            
+        }
+        
+        
+
+    }
+
+    private void initWL() {
+         try {
+            FileInputStream fis = new FileInputStream(new File("lapses.wlc"));
+             ObjectInputStream ois = new ObjectInputStream(fis);
+            
+            try{
+                this.lapseList = (ArrayList<SlideShowInfo>) ois.readObject();
+            }catch(Exception e){
+                System.err.println(e);
+            }finally{
+                ois.close();
+                fis.close();
+            }
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            
+        }
     }
     
 }

@@ -49,6 +49,14 @@ public class SlideShow extends Pane implements Serializable{
     double progress = 0;
     boolean b = false;
     SlideShowInfo ssi;
+
+    public SlideShowInfo getSsi() {
+        return ssi;
+    }
+
+    public void setSsi(SlideShowInfo ssi) {
+        this.ssi = ssi;
+    }
     transient SomeListener sl;
 
     public void setSl(SomeListener sl) {
@@ -271,7 +279,7 @@ public class SlideShow extends Pane implements Serializable{
         try {
             fos = new FileOutputStream(f);
             oos = new ObjectOutputStream(fos);
-            
+            ssi.setExportLocation(f);
             oos.writeObject(this);
             
             
@@ -301,6 +309,19 @@ public class SlideShow extends Pane implements Serializable{
         SlideShow temp = (SlideShow) ois.readObject();
         
         temp.setSl(sl);
+        
+        temp.setFileChooser(new DataManager());
+        
+        return temp;
+    }  
+    public static SlideShow loadSlideShow(SlideShowInfo ssi, SomeListener sl) throws FileNotFoundException, IOException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(ssi.getExportLocation());
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        
+        SlideShow temp = (SlideShow) ois.readObject();
+        
+        temp.setSl(sl);
+        temp.setSsi(ssi);
         
         temp.setFileChooser(new DataManager());
         
