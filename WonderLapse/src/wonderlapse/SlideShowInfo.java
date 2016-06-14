@@ -111,5 +111,10 @@ public class SlideShowInfo implements Serializable {
     public void addFile(File f){
         this.files.add(f);
     }
+
+    @Override
+    public String toString() {
+        return "SlideShowInfo{" + "files=" + files.get(0)+ " to " + files.get(files.size()-1) + ", frameRate=" + frameRate + ", res=" + res + ", sequenceDur=" + sequenceDur + ", exportLocation=" + exportLocation + ", name=" + name + '}';
+    }
     
 }

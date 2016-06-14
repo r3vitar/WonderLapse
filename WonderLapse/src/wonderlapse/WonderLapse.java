@@ -20,16 +20,19 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -45,8 +48,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import org.omg.CORBA.BAD_CONTEXT;
 
 /**
  *
@@ -66,11 +71,11 @@ public class WonderLapse extends Application implements SomeListener {
     //right
     //center
     ArrayList<SlideShowInfo> lapseList = new ArrayList<SlideShowInfo>();
-    ObservableList<ImageView> galleryItems = FXCollections.observableArrayList();
+    ObservableList<BorderPane> galleryItems = FXCollections.observableArrayList();
     TilePane galleryPane = new TilePane(Orientation.HORIZONTAL, 10, 10);
 
     TitledPane timlapsePane = new TitledPane("TimeLapse", null);
-    TitledPane renderPane = new TitledPane("Render", null);
+    TitledPane renderPane = new TitledPane("Render", new BorderPane(new Label("Not working because of ROTZMAN")));
     TitledPane managePane = new TitledPane("ManageFiles", galleryPane);
     Accordion mainAccordion = new Accordion(timlapsePane, renderPane, managePane);
 
@@ -81,11 +86,14 @@ public class WonderLapse extends Application implements SomeListener {
     Scene scene = new Scene(root, 720, 480);
     DataManager fileChooser = new DataManager();
 
+    Stage previewOptionStage = new Stage(StageStyle.UTILITY);
+
     final File sequenceSaver = new File("");
     SlideShow sss;
 
     @Override
     public void start(Stage ps) {
+        initOptionStage();
 
         initWL();
 
@@ -94,6 +102,13 @@ public class WonderLapse extends Application implements SomeListener {
         sss = new SlideShow(this);
 
         Button b1 = new Button("get");
+
+        b1.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                sss.initPics();
+            }
+        });
 
         Button bSave = new Button("Save");
 
@@ -105,10 +120,7 @@ public class WonderLapse extends Application implements SomeListener {
             this.lapseList.add(sss.getSsi());
         });
 
-        b1.setOnAction((ActionEvent e) -> sss.initPics());
-
-        Button setFps = new Button("setFps");
-         bp = new BorderPane();
+        bp = new BorderPane();
         Button bLoad = new Button("Load");
         bLoad.setOnAction((ActionEvent) -> {
             try {
@@ -125,18 +137,26 @@ public class WonderLapse extends Application implements SomeListener {
             }
         });
 
-        TextField tf = new TextField();
-        setFps.setOnAction((ActionEvent event) -> sss.setFps(Double.parseDouble(tf.getText())));
-
-        HBox h = new HBox(tf, setFps);
-
         Button b2 = new Button("play");
-        b2.setOnAction((ActionEvent e) -> sss.start());
+        b2.setOnAction((ActionEvent e) -> {
+            bp.setCenter(sss);
+
+            sss.start();
+        });
+
+        Button options = new Button("Options");
+        options.setOnAction((ActionEvent event) -> {
+            if (!previewOptionStage.isShowing()) {
+                previewOptionStage.show();
+            } else {
+                previewOptionStage.close();
+            }
+        });
+        HBox topButtons = new HBox(b1, b2, bSave, bLoad, options);
+        topButtons.autosize();
 
         bp.setCenter(sss);
-        bp.setLeft(b1);
-        bp.setRight(new VBox(b2, bSave, bLoad));
-        bp.setBottom(h);
+        bp.setTop(topButtons);
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -145,8 +165,6 @@ public class WonderLapse extends Application implements SomeListener {
 
             }
         });
-        mainAccordion.setExpandedPane(timlapsePane);
-        
 
         //root.getChildren().add(bp);
         this.timlapsePane.setContent(bp);
@@ -156,6 +174,27 @@ public class WonderLapse extends Application implements SomeListener {
         primaryStage.setScene(scene);
         primaryStage.show();
         //primaryStage.setMaximized(true);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+
+                mainAccordion.setExpandedPane(timlapsePane);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(10);
+                            mainAccordion.setExpandedPane(managePane);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                    }
+                }).start();
+
+            }
+        });
 
     }
 
@@ -217,13 +256,18 @@ public class WonderLapse extends Application implements SomeListener {
         } finally {
 
             for (int i = 0; i < this.lapseList.size(); i++) {
+                BorderPane ivbp = new BorderPane();
+                System.out.println(this.lapseList.get(i));
+
+                final int ii = i;
                 try {
-                    final int ii = i;
-                    Image img = new Image(new FileInputStream(this.lapseList.get(0).getFiles().get(0)), 200, 100, true, true);
+                    Image img = new Image(new FileInputStream(this.lapseList.get(i).getFiles().get((int) Math.round(this.lapseList.get(i).getFiles().size() / 2))), 200, 100, true, true);
 
                     ImageView iv = new ImageView(img);
+                    ivbp = new BorderPane(iv);
+                    ivbp.setTop(new BorderPane(new Label(this.lapseList.get(i).getName())));
 
-                    iv.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    ivbp.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent event) {
                             long time = System.currentTimeMillis() - lastClicked;
@@ -232,50 +276,98 @@ public class WonderLapse extends Application implements SomeListener {
                             }
 
                             lastClicked = System.currentTimeMillis();
+                            
                         }
 
                     });
-
-                    this.galleryItems.add(iv);
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+                    this.galleryItems.add(ivbp);
+                } catch (Exception e) {
+System.err.println(e);
                 } finally {
+                    
 
                 }
+
             }
             this.galleryPane.getChildren().addAll(galleryItems);
         }
     }
-        
 
-    public void doubleClick( int i) {
+    public void doubleClick(int i) {
         System.out.println("double click");
         try {
-                
-                    sss = SlideShow.loadSlideShow(this.lapseList.get(i), this);
-                
-            } catch (IOException ex) {
-                Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-             
-            bp.setCenter(sss);
-            
-            mainAccordion.setExpandedPane(this.timlapsePane);
-            new Thread(new Task() {
-                @Override
-                protected Object call() throws Exception {
-                    sss.start();
-                    return true;
 
-                }
-            }).start();
-            
-            }
-        
+            sss = SlideShow.loadSlideShow(this.lapseList.get(i), this);
+
+        } catch (IOException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(WonderLapse.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+
+            bp.setCenter(sss);
+
+            mainAccordion.setExpandedPane(this.timlapsePane);
+
+            bp.setCenter(new Label(sss.getSsi().getName()));
+
+        }
+
     }
 
     long lastClicked;
+
+    private void initOptionStage() {
+
+        this.previewOptionStage.setOnShowing(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Button save = new Button("Save");
+                Button cancel = new Button("Cancel");
+
+                Label nameL = new Label("Name");
+                TextField nameTf = new TextField();
+                nameTf.setMaxWidth(100);
+                nameTf.setText(sss.getSsi().getName());
+                BorderPane nameBp = new BorderPane(null, null, nameTf, null, nameL);
+
+                Label fpsL = new Label("FPS");
+                TextField fpsTf = new TextField();
+                fpsTf.setMaxWidth(50);
+                fpsTf.setText(Double.toString(sss.getSsi().getFrameRate()));
+                BorderPane fpsBp = new BorderPane(null, null, fpsTf, null, fpsL);
+
+                Label resL = new Label("Resolution (width x height)");
+                TextField xRes = new TextField();
+                xRes.setMaxWidth(50);
+                xRes.setText(Integer.toString((int) Math.round(sss.getSsi().getRes().getWidth())));
+                Label xL = new Label("x");
+                TextField yRes = new TextField();
+                yRes.setMaxWidth(50);
+                yRes.setText(Integer.toString((int) Math.round(sss.getSsi().getRes().getHeight())));
+
+                BorderPane resBp = new BorderPane(null, null, new HBox(xRes, xL, yRes), null, resL);
+
+                save.setOnAction((ActionEvent event2) -> {
+                    sss.setFps(Double.parseDouble(fpsTf.getText()));
+                    sss.setResolution(Double.parseDouble(xRes.getText()), Double.parseDouble(yRes.getText()));
+                    sss.getSsi().setName(nameTf.getText());
+                    previewOptionStage.close();
+                });
+                cancel.setOnAction((ActionEvent event2) -> {
+                    previewOptionStage.close();
+                });
+
+                BorderPane buttonBp = new BorderPane(null, null, save, null, cancel);
+
+                VBox root = new VBox(nameBp, fpsBp, resBp, buttonBp);
+                Scene previewOptionScene = new Scene(root, 300, 100);
+                previewOptionStage.setScene(previewOptionScene);
+                previewOptionStage.setResizable(false);
+
+            }
+        });
+
+    }
 
 }

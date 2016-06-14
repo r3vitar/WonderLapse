@@ -67,19 +67,23 @@ public class SlideShow extends Pane implements Serializable{
 
     public SlideShow(SomeListener sl, double width, double height) {
         this.sl = sl;
-        slp = new Duration((1 / 5) * 1000);
-        System.out.println(slp.toSeconds());
+        
         
         ssi = new SlideShowInfo(progress, new Resolution(width, height));
+        
+        setFps(15);
+        System.out.println(slp.toSeconds());
 
     }
     
     public SlideShow(SomeListener sl) {
         this.sl = sl;
-        slp = new Duration((1 / 5) * 1000);
-        System.out.println(slp.toSeconds());
+       
         
         ssi = new SlideShowInfo(progress, new Resolution(1280, 720));
+        
+         setFps(15);
+        System.out.println(slp.toSeconds());
 
     }
     
@@ -96,6 +100,7 @@ public class SlideShow extends Pane implements Serializable{
     }
 
     public void setFps(double fps) {
+        this.ssi.setFrameRate(fps);
         slp = new Duration(1000 / fps);
         System.out.println(slp.toMillis());
     }
@@ -145,8 +150,8 @@ public class SlideShow extends Pane implements Serializable{
                                         ImageView iv = new ImageView(frame);
                                         iv.setFitHeight(sl.getTimelapsePaneRes().getHeight());
                                         iv.setFitWidth(sl.getTimelapsePaneRes().getWidth());
-                                        iv.setPreserveRatio(true);
-                                        
+                                       // iv.setPreserveRatio(true);
+                                        //System.out.printf("%f x %f\n", iv.getFitWidth(), iv.getFitHeight());
                                         Platform.runLater(new Runnable() {
 
                                             @Override
@@ -280,6 +285,7 @@ public class SlideShow extends Pane implements Serializable{
         try {
             fos = new FileOutputStream(f);
             oos = new ObjectOutputStream(fos);
+            
             ssi.setExportLocation(f);
             oos.writeObject(this);
             
