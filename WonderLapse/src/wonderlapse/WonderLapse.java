@@ -75,7 +75,7 @@ public class WonderLapse extends Application implements SomeListener {
     TilePane galleryPane = new TilePane(Orientation.HORIZONTAL, 10, 10);
 
     TitledPane timlapsePane = new TitledPane("TimeLapse", null);
-    Label testL = new Label("Not working because of ROTZMAN");
+    Label testL = new Label("This amazing feature will come with future updates");
     TitledPane renderPane = new TitledPane("Render", new BorderPane(testL));
     TitledPane managePane = new TitledPane("ManageFiles", galleryPane);
     Accordion mainAccordion = new Accordion(timlapsePane, renderPane, managePane);
