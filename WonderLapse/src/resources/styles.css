@@ -1,0 +1,29 @@
+*{
+    -fx-font-family: "Roboto";
+}
+
+
+
+#name{
+    
+   
+     
+    -fx-font-size: 15px;
+    -fx-padding: 10px;
+    -fx-border-insets: 2px;
+    -fx-background-insets: 2px;
+    
+
+    
+}
+
+
+.button{
+    -fx-padding: 20px;
+    -fx-border-insets: 5px;
+    -fx-background-insets: 5px;
+}
+
+
+
+

@@ -105,6 +105,7 @@ public class SlideShowInfo implements Serializable {
     }
 
     public void setExportLocation(File exportLocation) {
+        
         this.exportLocation = exportLocation;
     }
     

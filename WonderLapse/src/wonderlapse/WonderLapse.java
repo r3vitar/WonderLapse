@@ -65,7 +65,7 @@ public class WonderLapse extends Application implements SomeListener {
     Menu fileMenu = new Menu("File", null, newMenuItem),
             editMenu = new Menu("Edit"),
             optionsMenu = new Menu("Options");
-    MenuBar mainBar = new MenuBar(fileMenu, editMenu, optionsMenu);
+   // MenuBar mainBar = new MenuBar(fileMenu, editMenu, optionsMenu);
     BorderPane bp;
 
     //right
@@ -75,13 +75,14 @@ public class WonderLapse extends Application implements SomeListener {
     TilePane galleryPane = new TilePane(Orientation.HORIZONTAL, 10, 10);
 
     TitledPane timlapsePane = new TitledPane("TimeLapse", null);
-    TitledPane renderPane = new TitledPane("Render", new BorderPane(new Label("Not working because of ROTZMAN")));
+    Label testL = new Label("Not working because of ROTZMAN");
+    TitledPane renderPane = new TitledPane("Render", new BorderPane(testL));
     TitledPane managePane = new TitledPane("ManageFiles", galleryPane);
     Accordion mainAccordion = new Accordion(timlapsePane, renderPane, managePane);
 
     BorderPane centerBorderPane = new BorderPane(mainAccordion);
 
-    BorderPane root = new BorderPane(centerBorderPane, mainBar, null, null, null);
+    BorderPane root = new BorderPane(centerBorderPane, null, null, null, null);
     Stage primaryStage;
     Scene scene = new Scene(root, 720, 480);
     DataManager fileChooser = new DataManager();
@@ -94,7 +95,7 @@ public class WonderLapse extends Application implements SomeListener {
     @Override
     public void start(Stage ps) {
         initOptionStage();
-
+        testL.setId("name");
         initWL();
 
         primaryStage = ps;
@@ -162,6 +163,7 @@ public class WonderLapse extends Application implements SomeListener {
             @Override
             public void handle(WindowEvent event) {
                 saveLapses();
+                Platform.exit();
 
             }
         });
@@ -169,8 +171,10 @@ public class WonderLapse extends Application implements SomeListener {
         //root.getChildren().add(bp);
         this.timlapsePane.setContent(bp);
         scene.setRoot(root);
+        scene.getStylesheets().add("resources/styles.css");
+        primaryStage.getIcons().add(new Image("resources/logowl.png"));
 
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("WonderLapse");
         primaryStage.setScene(scene);
         primaryStage.show();
         //primaryStage.setMaximized(true);
@@ -308,8 +312,9 @@ System.err.println(e);
             bp.setCenter(sss);
 
             mainAccordion.setExpandedPane(this.timlapsePane);
-
-            bp.setCenter(new Label(sss.getSsi().getName()));
+            Label title = new Label(sss.getSsi().getName());
+            title.setId("name");
+            bp.setCenter(title);
 
         }
 
@@ -362,7 +367,10 @@ System.err.println(e);
 
                 VBox root = new VBox(nameBp, fpsBp, resBp, buttonBp);
                 Scene previewOptionScene = new Scene(root, 300, 100);
+                        previewOptionScene.getStylesheets().add("resources/styles.css");
+
                 previewOptionStage.setScene(previewOptionScene);
+                previewOptionStage.getIcons().add(new Image("resources/logowl.png"));
                 previewOptionStage.setResizable(false);
 
             }

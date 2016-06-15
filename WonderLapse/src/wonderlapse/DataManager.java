@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 /**
  * Diese  Klasse ist für das einlesen der Dateien zuständig.
  * 
- * @author Philipp Radler
+ * 
  */
 public class DataManager {
     
