@@ -65,7 +65,7 @@ public class WonderLapse extends Application implements SomeListener {
     Menu fileMenu = new Menu("File", null, newMenuItem),
             editMenu = new Menu("Edit"),
             optionsMenu = new Menu("Options");
-   // MenuBar mainBar = new MenuBar(fileMenu, editMenu, optionsMenu);
+    // MenuBar mainBar = new MenuBar(fileMenu, editMenu, optionsMenu);
     BorderPane bp;
 
     //right
@@ -116,9 +116,13 @@ public class WonderLapse extends Application implements SomeListener {
         bSave.setOnAction((ActionEvent) -> {
             File f = new DataManager().saveWonderLapse();
 
-            sss.save(f);
+            if (isLapseSet(sss.getSsi())) {
+                sss.save(f);
 
-            this.lapseList.add(sss.getSsi());
+                this.lapseList.add(sss.getSsi());
+                this.galleryItems.add(mkIv(sss.getSsi()));
+            }else
+                System.err.println("Already Set");
         });
 
         bp = new BorderPane();
@@ -260,37 +264,8 @@ public class WonderLapse extends Application implements SomeListener {
         } finally {
 
             for (int i = 0; i < this.lapseList.size(); i++) {
-                BorderPane ivbp = new BorderPane();
-                System.out.println(this.lapseList.get(i));
 
-                final int ii = i;
-                try {
-                    Image img = new Image(new FileInputStream(this.lapseList.get(i).getFiles().get((int) Math.round(this.lapseList.get(i).getFiles().size() / 2))), 200, 100, true, true);
-
-                    ImageView iv = new ImageView(img);
-                    ivbp = new BorderPane(iv);
-                    ivbp.setTop(new BorderPane(new Label(this.lapseList.get(i).getName())));
-
-                    ivbp.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            long time = System.currentTimeMillis() - lastClicked;
-                            if (time < 300) {
-                                doubleClick(ii);
-                            }
-
-                            lastClicked = System.currentTimeMillis();
-                            
-                        }
-
-                    });
-                    this.galleryItems.add(ivbp);
-                } catch (Exception e) {
-System.err.println(e);
-                } finally {
-                    
-
-                }
+                this.galleryItems.add(mkIv(this.lapseList.get(i)));
 
             }
             this.galleryPane.getChildren().addAll(galleryItems);
@@ -366,8 +341,8 @@ System.err.println(e);
                 BorderPane buttonBp = new BorderPane(null, null, save, null, cancel);
 
                 VBox root = new VBox(nameBp, fpsBp, resBp, buttonBp);
-                Scene previewOptionScene = new Scene(root, 300, 100);
-                        previewOptionScene.getStylesheets().add("resources/styles.css");
+                Scene previewOptionScene = new Scene(root, 400, 175);
+                previewOptionScene.getStylesheets().add("resources/styles.css");
 
                 previewOptionStage.setScene(previewOptionScene);
                 previewOptionStage.getIcons().add(new Image("resources/logowl.png"));
@@ -376,6 +351,54 @@ System.err.println(e);
             }
         });
 
+    }
+
+    private BorderPane mkIv(SlideShowInfo ssi) {
+        int i = this.lapseList.indexOf(ssi);
+        BorderPane ivbp = new BorderPane();
+        System.out.println(this.lapseList.get(i));
+
+        final int ii = i;
+        try {
+            Image img = new Image(new FileInputStream(this.lapseList.get(i).getFiles().get((int) Math.round(this.lapseList.get(i).getFiles().size() / 2))), 200, 100, true, true);
+
+            ImageView iv = new ImageView(img);
+            ivbp = new BorderPane(iv);
+            ivbp.setTop(new BorderPane(new Label(this.lapseList.get(i).getName())));
+
+            ivbp.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    long time = System.currentTimeMillis() - lastClicked;
+                    if (time < 300) {
+                        doubleClick(ii);
+                    }
+
+                    lastClicked = System.currentTimeMillis();
+
+                }
+
+            });
+
+        } catch (Exception e) {
+            System.err.println(e);
+        } finally {
+            return ivbp;
+
+        }
+
+    }
+
+    private boolean isLapseSet(SlideShowInfo ssi) {
+        for (SlideShowInfo set : this.lapseList) {
+            if (set.getExportLocation() == ssi.getExportLocation()) {
+                return true;
+            }
+            if (set.getName() == ssi.getName() && ssi.getFiles() == set.getFiles()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

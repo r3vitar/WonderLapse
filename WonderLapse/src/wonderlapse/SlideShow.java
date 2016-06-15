@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.channels.SeekableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,12 +36,10 @@ import javafx.util.Duration;
  *
  * @author kacpe_000
  */
-public class SlideShow extends Pane implements Serializable{
+public class SlideShow extends Pane implements Serializable {
 
     transient DataManager fileChooser = new DataManager();
     public static long serialVerUID = 1L;
-
-    
 
     Duration slp = Duration.UNKNOWN;
     transient Thread timelapse;
@@ -67,35 +66,33 @@ public class SlideShow extends Pane implements Serializable{
 
     public SlideShow(SomeListener sl, double width, double height) {
         this.sl = sl;
-        
-        
+
         ssi = new SlideShowInfo(progress, new Resolution(width, height));
-        
+
         setFps(15);
         System.out.println(slp.toSeconds());
 
     }
-    
+
     public SlideShow(SomeListener sl) {
         this.sl = sl;
-       
-        
+
         ssi = new SlideShowInfo(progress, new Resolution(1280, 720));
-        
-         setFps(15);
+
+        setFps(15);
         System.out.println(slp.toSeconds());
 
     }
-    
+
     public void setFileChooser(DataManager fileChooser) {
         this.fileChooser = fileChooser;
     }
 
-    
-    public void setResolution(Resolution res){
+    public void setResolution(Resolution res) {
         ssi.setSequenceResolution(res);
     }
-    public void setResolution(double width, double height){
+
+    public void setResolution(double width, double height) {
         ssi.setSequenceResolution(width, height);
     }
 
@@ -116,7 +113,6 @@ public class SlideShow extends Pane implements Serializable{
 
         for (Object o : fileList) {
             File f = (File) o;
-            
 
             ssi.addFile(f);
         }
@@ -129,7 +125,7 @@ public class SlideShow extends Pane implements Serializable{
         getChildren().add(pb);
 
         timelapse = new Thread(new Task() {
-            
+
             int cnt = 0;
 
             @Override
@@ -138,8 +134,7 @@ public class SlideShow extends Pane implements Serializable{
                     ArrayList<Image> loadedImages = loadImages();
 
                     for (Image frame : loadedImages) {
-                        
-                        
+
                         try {
                             Platform.runLater(new Task() {
 
@@ -149,12 +144,12 @@ public class SlideShow extends Pane implements Serializable{
                                         getChildren().clear();
                                         ImageView iv = new ImageView(frame);
                                         Resolution tmpRes = ssi.getRes();
-                                        if(tmpRes.getHeight()<sl.getTimelapsePaneRes().getHeight() || 
-                                                tmpRes.getWidth()<sl.getTimelapsePaneRes().getWidth()){
-                                        iv.setFitHeight(sl.getTimelapsePaneRes().getHeight());
-                                        iv.setFitWidth(sl.getTimelapsePaneRes().getWidth());
-                                        
-                                       iv.setPreserveRatio(true);
+                                        if (tmpRes.getHeight() < sl.getTimelapsePaneRes().getHeight()
+                                                || tmpRes.getWidth() < sl.getTimelapsePaneRes().getWidth()) {
+                                            iv.setFitHeight(sl.getTimelapsePaneRes().getHeight());
+                                            iv.setFitWidth(sl.getTimelapsePaneRes().getWidth());
+
+                                            iv.setPreserveRatio(true);
                                         }
                                         //System.out.printf("%f x %f\n", iv.getFitWidth(), iv.getFitHeight());
                                         Platform.runLater(new Runnable() {
@@ -209,14 +204,12 @@ public class SlideShow extends Pane implements Serializable{
         pb = new ProgressBar();
         progress = 0;
         b = false;
-        
-        
-        
+
         Thread prT = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
-               
+
                 do {
                     pb.setProgress(progress / ssi.getFiles().size());
                     try {
@@ -230,21 +223,18 @@ public class SlideShow extends Pane implements Serializable{
             }
         });
         prT.start();
-        
-        
-            res = ssi.getRes();
-        
-        
+
+        res = ssi.getRes();
 
         Thread t1 = new Thread(new Task() {
 
             @Override
             protected Object call() throws Exception {
 
-                for (double idx = 0; idx < ssi.getFiles().size() /*/ 4*/; idx++) {
+                for (double idx = 0; idx < ssi.getFiles().size(); idx++) {
                     InputStream is = new FileInputStream(ssi.getFiles().get((int) idx));
                     Image i = new Image(is, res.getWidth(), res.getHeight(), true, false);
-                    
+
                     if (i.isError()) {
                         System.err.println("büd geht ned");
                     } else {
@@ -258,8 +248,7 @@ public class SlideShow extends Pane implements Serializable{
                 return true;
             }
         });
-        
-  
+
         t1.start();
 //        t2.start();
 //        t3.start();
@@ -282,19 +271,16 @@ public class SlideShow extends Pane implements Serializable{
         progress++;
     }
 
-   public void save(File f) {
-       FileOutputStream fos = null;
-       ObjectOutputStream oos = null;
+    public void save(File f) {
+        FileOutputStream fos = null;
+        ObjectOutputStream oos = null;
         try {
             fos = new FileOutputStream(f);
             oos = new ObjectOutputStream(fos);
-            
+
             ssi.setExportLocation(f);
             oos.writeObject(this);
-            
-            
-            
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -307,43 +293,43 @@ public class SlideShow extends Pane implements Serializable{
                 Logger.getLogger(SlideShow.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-       
-       
-        
+
     }
 
     public static SlideShow loadSlideShow(File f, SomeListener sl) throws FileNotFoundException, IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(f);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        
+
         SlideShow temp = (SlideShow) ois.readObject();
-        
+
         temp.setSl(sl);
-        
+
         temp.setFileChooser(new DataManager());
-        
+
         return temp;
-    }  
+    }
+
     public static SlideShow loadSlideShow(SlideShowInfo ssi, SomeListener sl) throws FileNotFoundException, IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(ssi.getExportLocation());
         ObjectInputStream ois = new ObjectInputStream(fis);
-        
+
         SlideShow temp = (SlideShow) ois.readObject();
-        
+
         temp.setSl(sl);
         temp.setSsi(ssi);
-        
+
         temp.setFileChooser(new DataManager());
-        
+
         return temp;
-        
+
     }
-    
-    public Image getFirstImage() throws FileNotFoundException{
-        return new Image(new FileInputStream(this.ssi.getFiles().get((int)Math.round(Math.random()*this.ssi.getFiles().size()))));
+
+    public Image getFirstImage() throws FileNotFoundException {
+        return new Image(new FileInputStream(this.ssi.getFiles().get((int) Math.round(Math.random() * this.ssi.getFiles().size()))));
     }
-    public static Image getFirstImage(SlideShow s) throws FileNotFoundException{
-        return new Image(new FileInputStream(s.ssi.getFiles().get((int)Math.round(Math.random()*s.ssi.getFiles().size()))));
+
+    public static Image getFirstImage(SlideShow s) throws FileNotFoundException {
+        return new Image(new FileInputStream(s.ssi.getFiles().get((int) Math.round(Math.random() * s.ssi.getFiles().size()))));
     }
 
 }
