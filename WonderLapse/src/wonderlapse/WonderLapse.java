@@ -116,11 +116,13 @@ public class WonderLapse extends Application implements SomeListener {
         bSave.setOnAction((ActionEvent) -> {
             File f = new DataManager().saveWonderLapse();
 
-            if (isLapseSet(sss.getSsi())) {
+            if (!isLapseSet(sss.getSsi())) {
                 sss.save(f);
-
-                this.lapseList.add(sss.getSsi());
-                this.galleryItems.add(mkIv(sss.getSsi()));
+                SlideShowInfo ssi = sss.getSsi();
+                this.lapseList.add(ssi);
+                BorderPane ivbp = mkIv(ssi);
+                this.galleryItems.add(ivbp);
+                this.galleryPane.getChildren().add(ivbp);
             }else
                 System.err.println("Already Set");
         });
@@ -394,7 +396,7 @@ public class WonderLapse extends Application implements SomeListener {
             if (set.getExportLocation() == ssi.getExportLocation()) {
                 return true;
             }
-            if (set.getName() == ssi.getName() && ssi.getFiles() == set.getFiles()) {
+            if ((set.getName() == null ? ssi.getName() == null : set.getName().equals(ssi.getName())) && ssi.getFiles() == set.getFiles()) {
                 return true;
             }
         }
