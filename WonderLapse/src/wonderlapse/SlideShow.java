@@ -144,12 +144,12 @@ public class SlideShow extends Pane implements Serializable {
                                         getChildren().clear();
                                         ImageView iv = new ImageView(frame);
                                         Resolution tmpRes = ssi.getRes();
-                                        if (tmpRes.getHeight() < sl.getTimelapsePaneRes().getHeight()
-                                                || tmpRes.getWidth() < sl.getTimelapsePaneRes().getWidth()) {
+                                        if (tmpRes.getHeight() > sl.getTimelapsePaneRes().getHeight()
+                                                || tmpRes.getWidth() > sl.getTimelapsePaneRes().getWidth()) {
                                             iv.setFitHeight(sl.getTimelapsePaneRes().getHeight());
                                             iv.setFitWidth(sl.getTimelapsePaneRes().getWidth());
 
-                                            iv.setPreserveRatio(true);
+                                           // iv.setPreserveRatio(true);
                                         }
                                         //System.out.printf("%f x %f\n", iv.getFitWidth(), iv.getFitHeight());
                                         Platform.runLater(new Runnable() {
